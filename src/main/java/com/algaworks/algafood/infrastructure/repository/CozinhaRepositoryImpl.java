@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository;
 
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
 import com.algaworks.algafood.domain.model.Cozinha;
@@ -23,8 +24,7 @@ public class CozinhaRepositoryImpl implements CozinhaRepository {
 		 * TypedQuery<Cozinha> query = manager.createQuery("from Cozinha",
 		 * Cozinha.class); return query.getResultList();
 		 */
-		return manager.createQuery("from Cozinha", Cozinha.class)
-				.getResultList();
+		return manager.createQuery("from Cozinha", Cozinha.class).getResultList();
 	}
 
 	@Override
@@ -40,9 +40,11 @@ public class CozinhaRepositoryImpl implements CozinhaRepository {
 
 	@Transactional
 	@Override
-	public void remover(Cozinha cozinha) {
-		cozinha = buscar(cozinha.getId());
+	public void remover(Long id) {
+		Cozinha cozinha = buscar(id);
+		if (cozinha == null) {
+			throw new EmptyResultDataAccessException(1);
+		}
 		manager.remove(cozinha);
 	}
-
 }
