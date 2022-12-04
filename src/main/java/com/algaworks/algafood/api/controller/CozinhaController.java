@@ -64,5 +64,6 @@ public class CozinhaController {
 	public void adicionar(@RequestBody Cozinha cozinha) { /*-> Essa anotação define que o corpo da requisição será vinculado a esse parâmetro. */
 		cozinha = cozinhaRepository.salvar(cozinha);
 		
+		
 	}
 }
