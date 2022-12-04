@@ -23,7 +23,8 @@ public class CozinhaRepositoryImpl implements CozinhaRepository {
 		 * TypedQuery<Cozinha> query = manager.createQuery("from Cozinha",
 		 * Cozinha.class); return query.getResultList();
 		 */
-		return manager.createQuery("from Cozinha", Cozinha.class).getResultList();
+		return manager.createQuery("from Cozinha", Cozinha.class)
+				.getResultList();
 	}
 
 	@Override
