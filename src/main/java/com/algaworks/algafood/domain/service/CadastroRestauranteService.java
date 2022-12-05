@@ -22,7 +22,8 @@ public class CadastroRestauranteService {
 		try {
 			restauranteRepository.remover(restauranteId);
 		} catch (EmptyResultDataAccessException e) {
-			throw new EntidadeNaoEncontradaException(String.format("Entity not found. Id: %d", restauranteId));
+			throw new EntidadeNaoEncontradaException(String.format
+					("Entity not found. Id: %d", restauranteId));
 		}
 	}
 
