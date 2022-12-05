@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 
@@ -34,6 +35,10 @@ public class EstadoRepositoryImpl implements EstadoRepository {
 	@Override
 	public void remover(Estado estado) {
 		estado = buscar(estado.getId());
+		if (estado == null) {
+			throw new EntidadeNaoEncontradaException("Entity not found.");
+		}
 		manager.remove(estado);
 	}
+
 }
