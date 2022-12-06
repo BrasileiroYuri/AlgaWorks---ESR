@@ -36,5 +36,4 @@ public class EstadoController {
 		 }
 		 return ResponseEntity.status(HttpStatus.OK).body(estado);
 	 }
-
 }

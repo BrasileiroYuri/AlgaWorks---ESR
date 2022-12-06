@@ -26,7 +26,6 @@ public class Restaurante {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@JsonProperty("RestaurantName")
 	@Column(nullable = false)
 	private String nome;
 

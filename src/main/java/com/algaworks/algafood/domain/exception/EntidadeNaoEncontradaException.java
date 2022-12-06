@@ -6,7 +6,4 @@ public class EntidadeNaoEncontradaException extends RuntimeException {
 	public EntidadeNaoEncontradaException(String mensagem) {
 		super(mensagem);
 	}
-	public String getMessage() {
-		return super.getMessage();
-	}
 }

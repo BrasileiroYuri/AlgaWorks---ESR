@@ -24,9 +24,9 @@ import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 
-@Controller/*->Essa notação define a classe responsável por receber, processar requisições eenviar uma resposta.
+@Controller /*->Essa notação define a classe responsável por receber, processar requisições eenviar uma resposta.
 @ResponseBody/*->Essa notação define que o retorno dos métodos será o retorno da requisição. */
-@RestController/*->A junção das duas. Melhora a semântica visto que define como uma API REST. */
+@RestController /*->A junção das duas. Melhora a semântica visto que define como uma API REST. */
 @RequestMapping("/restaurantes")
 public class RestauranteController {
 
@@ -51,10 +51,15 @@ public class RestauranteController {
 	}
 
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public Restaurante adicionar(@RequestBody Restaurante restaurante) {
-		return cadastroRestaurante.salvar(restaurante);
+	public ResponseEntity<?> adicionar(@RequestBody Restaurante restaurante) {
+		try {
+			restaurante = cadastroRestaurante.salvar(restaurante);
+			return ResponseEntity.status(HttpStatus.CREATED).body(restaurante);
+		} catch (EntidadeNaoEncontradaException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
 	}
+
 	@PutMapping("/{restauranteId}")
 	public ResponseEntity<Restaurante> atualizar(@PathVariable Long restauranteId,
 			@RequestBody Restaurante restaurante) {
