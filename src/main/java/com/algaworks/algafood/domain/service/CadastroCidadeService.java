@@ -1,8 +1,11 @@
 package com.algaworks.algafood.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.model.Estado;
@@ -25,8 +28,20 @@ public class CadastroCidadeService {
 			cidade.setEstado(estado);
 			return cidadeRepository.salvar(cidade);
 		}
-		throw new EntidadeNaoEncontradaException
-		(String.format("Esse código de Estado não existe %d.", estadoId));
+		throw new EntidadeNaoEncontradaException(String.format("Esse código de Estado não existe %d.", estadoId));
 	}
 
+	public void excluir(Long cidadeId) {
+		try {
+			cidadeRepository.remover(cidadeId);
+		} catch (EmptyResultDataAccessException e) {
+			throw new EntidadeNaoEncontradaException(
+					String.format
+					("Não existe cadastro de cidede com código %d.", cidadeId));
+		} catch (DataIntegrityViolationException e) {
+			throw new EntidadeEmUsoException(
+					String.format
+					("Cidade de código %d não pode ser removida, pois está em uso.", cidadeId));
+		}
+	}
 }

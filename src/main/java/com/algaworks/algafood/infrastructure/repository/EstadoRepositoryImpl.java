@@ -2,14 +2,15 @@ package com.algaworks.algafood.infrastructure.repository;
 
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
-import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 @Component
 public class EstadoRepositoryImpl implements EstadoRepository {
@@ -27,16 +28,18 @@ public class EstadoRepositoryImpl implements EstadoRepository {
 
 	}
 
+	@Transactional
 	@Override
 	public Estado salvar(Estado estado) {
 		return manager.merge(estado);
 	}
 
+	@Transactional
 	@Override
-	public void remover(Estado estado) {
-		estado = buscar(estado.getId());
+	public void remover(Long estadoId) {
+		Estado estado = buscar(estadoId);
 		if (estado == null) {
-			throw new EntidadeNaoEncontradaException("Entity not found.");
+			throw new EmptyResultDataAccessException(1);
 		}
 		manager.remove(estado);
 	}
