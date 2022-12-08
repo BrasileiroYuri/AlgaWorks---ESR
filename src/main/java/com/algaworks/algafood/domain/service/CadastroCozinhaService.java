@@ -17,12 +17,12 @@ public class CadastroCozinhaService {
 	private CozinhaRepository cozinhaRepository;
 	
 	public Cozinha salvar(Cozinha cozinha) {
-		return cozinhaRepository.salvar(cozinha);
+		return cozinhaRepository.save(cozinha); /*Aqui chamamos o método save do JPARepository. */
 	}
 
 	public void excluir(Long cozinhaId) {
 		try {
-			cozinhaRepository.remover(cozinhaId);
+			cozinhaRepository.deleteById(cozinhaId); /*Com o deleteById, caso o objeto não exista, esse método lança uma EmptyResultDataAccessException.*/
 		} catch (EmptyResultDataAccessException e) {
 			throw new EntidadeNaoEncontradaException(
 					String.format("Não existe um cadastro de cozinha com código %d.", cozinhaId));

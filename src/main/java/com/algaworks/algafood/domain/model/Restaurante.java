@@ -28,7 +28,7 @@ public class Restaurante {
 	private Long id;
 	@Column(nullable = false)
 	private String nome;
-
+	@JsonProperty("taxaFrete")
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
 	@ManyToOne
