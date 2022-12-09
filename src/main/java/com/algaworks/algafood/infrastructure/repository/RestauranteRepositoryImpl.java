@@ -1,52 +1,27 @@
 package com.algaworks.algafood.infrastructure.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import com.algaworks.algafood.domain.model.Restaurante;
-import com.algaworks.algafood.domain.repository.RestauranteRepository;
+import com.algaworks.algafood.domain.repository.RestauranteRepositoryQueries;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 @Repository
-public class RestauranteRepositoryImpl implements RestauranteRepository {
+public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 
 	@PersistenceContext
 	private EntityManager manager;
 
 	@Override
-	public List<Restaurante> listar() {
-		/*
-		 * TypedQuery<Restaurante> query = manager.createQuery("from Restaurante",
-		 * Restaurante.class); return query.getResultList();
-		 */
-		return manager.createQuery("from Restaurante", Restaurante.class).getResultList();
+	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
+		var jpql = "from Restaurante where nome like :nome and taxaFrete between :taxaInicial and :taxaFinal";
+		return manager.createQuery(jpql, Restaurante.class).setParameter("nome", "%" + nome + "%")
+				.setParameter("taxaInicial", taxaFreteInicial).setParameter("taxaFinal", taxaFreteFinal)
+				.getResultList();
 	}
-
-	@Override
-	public Restaurante buscar(Long id) {
-		return manager.find(Restaurante.class, id);
-	}
-
-	@Transactional
-	@Override
-	public Restaurante salvar(Restaurante restaurante) {
-		return manager.merge(restaurante);
-	}
-
-	@Transactional
-	@Override
-	public void remover(Long id) {
-		Restaurante restaurante = buscar(id);
-		if (restaurante == null) {
-			throw new EmptyResultDataAccessException(1);
-		}
-		manager.remove(restaurante);
-	}
-
 }

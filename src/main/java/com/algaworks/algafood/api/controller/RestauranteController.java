@@ -3,6 +3,7 @@ package com.algaworks.algafood.api.controller;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +41,14 @@ public class RestauranteController {
 
 	@GetMapping
 	public List<Restaurante> listar() {
-		return restauranteRepository.listar();
+		return restauranteRepository.findAll();
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Restaurante> buscar(@PathVariable Long id) {
-		Restaurante restaurante = restauranteRepository.buscar(id);
+		Optional <Restaurante> restaurante = restauranteRepository.findById(id);
 		if (restaurante != null) {
-			return ResponseEntity.status(HttpStatus.OK).body(restaurante);
+			return ResponseEntity.status(HttpStatus.OK).body(restaurante.get());
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -65,11 +66,11 @@ public class RestauranteController {
 	@PutMapping("/{restauranteId}")
 	public ResponseEntity<?> atualizar(@PathVariable Long restauranteId, @RequestBody Restaurante restaurante) {
 		try {
-			Restaurante restauranteAtual = restauranteRepository.buscar(restauranteId);
-			if (restauranteAtual != null) {
-				BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
-				restauranteAtual = cadastroRestaurante.salvar(restauranteAtual);
-				return ResponseEntity.status(HttpStatus.OK).body(restauranteAtual);
+			Optional <Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
+			if (restauranteAtual.isPresent()) {
+				BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id");
+				Restaurante restauranteSalvar = cadastroRestaurante.salvar(restauranteAtual.get());
+				return ResponseEntity.status(HttpStatus.OK).body(restauranteSalvar);
 			}
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		} catch (EntidadeNaoEncontradaException e) {
@@ -89,12 +90,12 @@ public class RestauranteController {
 
 	@PatchMapping("/{restauranteId}") /* Atualização parcial de um recurso utilizando o método HTTP PATCH.*/
 	public ResponseEntity<?> atualizarParcial(@PathVariable Long restauranteId, @RequestBody Map<String, Object> campos) {
-		Restaurante restauranteAtual = restauranteRepository.buscar(restauranteId);
-		if (restauranteAtual == null) {
+		Optional <Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
+		if (restauranteAtual.isPresent()) {
 			return ResponseEntity.notFound().build(); /*Caso o recurso pedido pelo cliente (id) no corpo da Request seja inexistente, o método termina aqui com um 404.*/
 		}
-		merge(campos, restauranteAtual);
-		return atualizar(restauranteId, restauranteAtual); /* Utilizado visto que esse método possui tratamentos de possiveis exceções e verifica-se em Service os objetos aninhados (Cozinha).*/
+		merge(campos, restauranteAtual.get());
+		return atualizar(restauranteId, restauranteAtual.get()); /* Utilizado visto que esse método possui tratamentos de possiveis exceções e verifica-se em Service os objetos aninhados (Cozinha).*/
 		}
 	/*Aqui mescla-se usando a API de Reflections do Spring. Essa Reflections se refere a capacidade de inspecionar e alterar objetos Java em tempo de execução, de uma maneira genérica.*/
 	private void merge(Map<String, Object> dadosOrigem, Restaurante RestauranteDestino) { /*Esse método mescla as propriedades do Map para dentro do objeto restaurante.*/

@@ -32,7 +32,7 @@ public class CidadeController {
 
 	@Autowired
 	private CadastroCidadeService cadastroCidade;
-
+	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<Cidade> listar() {
@@ -63,7 +63,7 @@ public class CidadeController {
 		try {
 			Optional<Cidade> cidadeAtual = cidadeRepository.findById(cidadeId); /* Aqui eu verifico se a cidade existe. */
 			if (cidadeAtual.isPresent()) { /* Se ela existir, entra aqui. */
-				BeanUtils.copyProperties(cidade, cidadeAtual, "id"); /* Copio as propriedades */
+				BeanUtils.copyProperties(cidade, cidadeAtual.get(), "id"); /* Copio as propriedades */
 				Cidade cidadeSalva= cadastroCidade.salvar(cidadeAtual.get()); /* Tento salvar. */
 				return ResponseEntity.status(HttpStatus.OK).body(cidadeSalva);
 			}
