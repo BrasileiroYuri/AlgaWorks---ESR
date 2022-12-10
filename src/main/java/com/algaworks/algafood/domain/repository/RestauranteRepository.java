@@ -22,6 +22,5 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long>,
 
 	List<Restaurante> findTop2ByNomeContaining(String nome);
 	
-	List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal);
-
+	
 	}
