@@ -1,5 +1,8 @@
 package com.algaworks.algafood.api.controller;
 
+import static com.algaworks.algafood.infrastructure.repository.spec.RestauranteSpecs.comFreteGratis;
+import static com.algaworks.algafood.infrastructure.repository.spec.RestauranteSpecs.comNomeSemelhante;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +30,7 @@ public class TestController {
 
 	@Autowired
 	private RestauranteRepository restauranteRepository;
-	
+
 	@RequestMapping(value = "/restaurante/por-nome", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public Optional<Restaurante> cozinhasPorNome(@RequestParam String nome) {
@@ -40,23 +43,30 @@ public class TestController {
 		return cozinhaRepository.findByNome(nome);
 	}
 
-	@GetMapping(value="/restaurantes/por-taxa-frete")
-	public List<Restaurante> restaurantesPorTaxaFrete(@RequestParam("taxainicial") BigDecimal taxaInicial, @RequestParam("taxafinal") BigDecimal taxaFinal) {
+	@GetMapping(value = "/restaurantes/por-taxa-frete")
+	public List<Restaurante> restaurantesPorTaxaFrete(@RequestParam("taxainicial") BigDecimal taxaInicial,
+			@RequestParam("taxafinal") BigDecimal taxaFinal) {
 		return restauranteRepository.findByTaxaFreteBetween(taxaInicial, taxaFinal);
 	}
-	@GetMapping(value="/restaurantes/por-nome")
+
+	@GetMapping(value = "/restaurantes/por-nome")
 	public List<Restaurante> restaurantePrimeiroPorNome(String nome, Long id) {
-		return restauranteRepository.consultarPorNome(nome, id); 
+		return restauranteRepository.consultarPorNome(nome, id);
 	}
 
-	@GetMapping(value="/restaurantes/top2-por-nome")
+	@GetMapping(value = "/restaurantes/top2-por-nome")
 	public List<Restaurante> restaurantesTop2PorNome(@RequestParam String nome) {
-		return restauranteRepository.findTop2ByNomeContaining(nome); /*First -> apenas o primeiro resultado.*/
+		return restauranteRepository.findTop2ByNomeContaining(nome);
 	}
-	
-	@GetMapping(value="/restaurantes/por-nome-e-frete")
+
+	@GetMapping("/restaurantes/por-nome-e-frete")
 	public List<Restaurante> restaurantesPorNome(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
-		return restauranteRepository.find(nome, taxaFreteInicial, taxaFreteFinal); 
+		return restauranteRepository.find(nome, taxaFreteInicial, taxaFreteFinal);
 	}
-	
+
+	@GetMapping("/restaurantes/com-frete-gratis")
+	public List<Restaurante> restaurantesComFreteGratis(String nome) {
+		return restauranteRepository
+				.findAll(comFreteGratis().and(comNomeSemelhante(nome)));
+	}
 }
