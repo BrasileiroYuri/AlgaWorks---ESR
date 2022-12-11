@@ -32,9 +32,9 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 	 */
 	@Override
 	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
-		
+
 		Integer[] p = new Integer[1];
-		
+
 		/*
 		 * Aqui vamos usar Criteria API. Criteria é uma interface/API para criar
 		 * consultar dinâmicas e programáticas. Por sua burocracia, é preferível usá-la
@@ -69,7 +69,7 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 			predicates.add(builder.like(root.get("nome"), "%" + nome + "%"));
 		} /*
 			 * Um predicado é um critério de pesquisa, um filtro, construido por atributo
-			 * que queremos na Query. Nesse predicado, estamos definindo o critério de busca
+			 * que queremos na Query. Nesse predicado, estamos definindo o critério de busca					
 			 * (ou filtro) de um determinado atributo, no caso nome.
 			 */
 		if (taxaFreteInicial != null) {
