@@ -1,11 +1,9 @@
 package com.algaworks.algafood.infrastructure.repository;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepositoryQueries;
@@ -13,6 +11,10 @@ import com.algaworks.algafood.domain.repository.RestauranteRepositoryQueries;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 /*Repositório customizado. Para repositórios customizados com SDJ usamos o nome do repositório
 com o sufixo Impl. Assim ele identifica a implementação.*/
@@ -27,56 +29,67 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 	 * código Java.
 	 */
 	@Override
-	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial,
-			BigDecimal taxaFreteFinal) { /*
-											 * Criamos aqui uma consulta dinâmica, definida pelos parâmetros passados ao
-											 * método. Em JPQL será feito com concatenação de Strings.
-											 */
-		var jpql = new StringBuilder();
-		var parametros = new HashMap<String, Object>(); /*
-														 * Usamos esse Map para atribuir os parâmetros, visto que eles
-														 * também devem ser dinâmicos. Isso pois, caso seja declarado um
-														 * parâmetro sem valor na JQPL ocorrerá uma Exception.
-														 */
-		jpql.append("from Restaurante where 0=0 "); /*
-													 * 0=0 sempre será true. Dessa forma, se nenhum valor for dado, será
-													 * retornado todos os objetos do tipo pesquisado, ou seja,
-													 * instâncias de Restaurante.
-													 */
-		if (StringUtils.hasLength(nome)) { /* Aqui verifica-se se o nome está ou vazio, sem caracteres("") ou nulo. */
-			jpql.append("and nome like :nome ");
-			parametros.put("nome", "%" + nome + "%"); /*
-														 * Aqui estamos adicionando um parãmetro com chave e valor,
-														 * dependendo dos vindos dos parâmetros do próprio método.
-														 */
-		}
-		if (taxaFreteInicial != null) {
-			jpql.append("and taxaFrete >= :taxaInicial ");
-			parametros.put("taxaInicial", taxaFreteInicial); /*
-																 * Aqui não é usado o Between pois os dois parâmetros
-																 * de taxa não são obrigátorios e podem vir sem o outro.
-																 * Assim, constrói-se a partir de estruturas (and).
-																 */
-		}
-		if (taxaFreteFinal != null) {
-			jpql.append("and taxaFrete <= :taxaFinal");
-			parametros.put("taxaFinal", taxaFreteFinal);
-		}
-		TypedQuery<Restaurante> query = manager.createQuery(jpql.toString(), Restaurante.class);
-		parametros.forEach((chave, valor) -> query.setParameter(chave,
-				valor)); /*
-							 * Nesse laço, para cada chave e valor atribudos no Map, é feito um
-							 * setParameter() com os mesmos valores.
-							 */
-		return query.getResultList();
-	}
+	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
+		/*
+		 * Aqui vamos usar Criteria API. Criteria é uma interface/API para criar
+		 * consultar dinâmicas e programáticas. Por sua burocracia, é preferível usá-la
+		 * em consultas complexas.
+		 */
+		CriteriaBuilder builder = manager
+				.getCriteriaBuilder(); /*
+										 * CriteriaBuilder é uma interface que serve como Factory pra construir
+										 * elementos de consulta, inclusive o CriteriaQuery, a partir do EntityManager.
+										 * Também possui diversos métodos para criar expressões para diversos critérios.
+										 * Esses elementos são métodos que indicam algum critério de consulta.
+										 */
+		CriteriaQuery<Restaurante> criteria = builder.createQuery(
+				Restaurante.class);/*
+									 * Essa interface é responsável por definir a estrutura de uma Query, ou seja, a
+									 * composição das clausulas. Isso é feito por meio de seus métodos (Select, from
+									 * etc). Seu Generics define o tipo do resultado(consulta).
+									 */
+		/*Cláusulas são instruções dadas ao SQL, As mais comuns são SELECT, FROM e WHERE.
+		 * Já os elementos de uma Query são relacionando a atributos/colunas. São predicados.*/
+		Root<Restaurante> root = criteria.from(
+				Restaurante.class); /*
+									 * Root significa raiz. Refere-se a entidade que estamos realizando a consulta
+									 * (ou tabela, no modelo relacional). Podemos usar essa raiz para criar
+									 * predicados(filtros) de quais entidades queremos na Query, com qual atributo.
+									 */
+		Predicate nomePredicate = builder.like(root.get("nome"),
+				"%" + nome + "%"); /*
+									 * Um predicado é um critério de pesquisa, um filtro, construido por atributo
+									 * que queremos na Query. Nesse predicado, estamos definindo o critério de busca
+									 * (ou filtro) de um determinado atributo, no caso nome.
+									 */
+		Predicate taxaInicialPredicate = builder.greaterThanOrEqualTo(root.get("taxaFrete"),
+				taxaFreteInicial); /*
+									 * No primeiro parâmetro, definimos qual atributo de qual entidade queremos usar
+									 * na pesquisa. Ex: queremos fazer uma consulta de tal entidade (visto que uma
+									 * consulta pode ter várias entidades - tabelas, no modelo relacional -)com tal
+									 * atributo, criamos um predicado desse atributo, relacionando com outro. Nesse
+									 * segundo, definimos o valor que queremos relacionar, a partir da ação do
+									 * método. Ex: greaterThanOrEqualTo, like etc.
+									 */
+		Predicate taxaFinalPredicate = builder.lessThanOrEqualTo(root.get("taxaFrete"), taxaFreteFinal);
+		/*
+		 * A partir do CriteriaBuilder nós criamos o CriteriaQuery. A partir do
+		 * CriteriaQuery nós criamos o Root, e a partir do Root, usando o
+		 * CriteriaBuilder criamos um Predicade.*/
 
-//	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
-//		var jpql = "from Restaurante where nome like :nome and taxaFrete between :taxaInicial and :taxaFinal";
-//		/*Query JPQL.*/
-//		return manager.createQuery(jpql, Restaurante.class)
-//				.setParameter("nome", "%" + nome + "%") /*NomeContaining*/ 
-//				.setParameter("taxaInicial", taxaFreteInicial).setParameter("taxaFinal", taxaFreteFinal) /*ByTaxaFreteBetween*/
-//				.getResultList();
-//}
+		criteria.where(nomePredicate, taxaInicialPredicate,
+				taxaFinalPredicate); /* O método Where recebe um ou mais predicados. */
+		TypedQuery<Restaurante> query = manager.createQuery(criteria);
+		/*
+		 * Nessa sobrecarga, não é necessário definir o tipo da Query. Ele já está na
+		 * variável de CriteriaQuery.
+		 */
+		return query.getResultList();
+	};
+	/*
+	 * Aqui começamos a usar CRITERIA API. Para usar o CriteriaQuery, precisamos de'
+	 * uma instância de CriteriaBuilder, interface fábrica de elementos de consulta.
+	 * Podemos instanciá-lo a partir do EntityManager.getCriteriaBuilder(). Depois,
+	 * a partir da instância de CriteriaBuilder chamamos o método CreateQuery.
+	 */
 }
