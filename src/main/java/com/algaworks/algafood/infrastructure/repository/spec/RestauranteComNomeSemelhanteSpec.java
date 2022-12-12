@@ -14,12 +14,9 @@ import lombok.AllArgsConstructor;
 public class RestauranteComNomeSemelhanteSpec implements Specification<Restaurante> {
 
 	private static final long serialVersionUID = 1L;
-
 	private String nome;
 
-	@Override
 	public Predicate toPredicate(Root<Restaurante> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 		return criteriaBuilder.like(root.get("nome"), nome);
 	}
-
 }
