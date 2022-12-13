@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
@@ -27,9 +28,9 @@ import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Controller /*->Essa notação define a classe responsável por receber, processar requisições eenviar uma resposta.
-@ResponseBody/*->Essa notação define que o retorno dos métodos será o retorno da requisição. */
-@RestController /*->A junção das duas. Melhora a semântica visto que define como uma API REST. */
+@Controller
+@ResponseBody
+@RestController 
 @RequestMapping("/restaurantes")
 public class RestauranteController {
 
