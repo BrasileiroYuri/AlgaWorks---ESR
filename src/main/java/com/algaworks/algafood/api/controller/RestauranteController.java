@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @ResponseBody
-@RestController 
+@RestController
 @RequestMapping("/restaurantes")
 public class RestauranteController {
 
