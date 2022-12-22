@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.Cidade;
+import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.CidadeRepository;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
@@ -19,12 +20,14 @@ public class CadastroCidadeService {
 	private CidadeRepository cidadeRepository;
 
 	@Autowired
+	private CadastroEstadoService cadastroEstado;
+
+	@Autowired
 	private EstadoRepository estadoRepository;
 
 	public Cidade salvar(Cidade cidade) {
 		Long estadoId = cidade.getEstado().getId();
-		Estado estado = estadoRepository.findById(estadoId).orElseThrow(() -> new EntidadeNaoEncontradaException(
-				String.format("Esse código de Estado não existe %d.", estadoId)));
+		Estado estado = cadastroEstado.buscarOuFalhar(estadoId);
 		cidade.setEstado(estado);
 		return cidadeRepository.save(cidade);
 
@@ -40,5 +43,11 @@ public class CadastroCidadeService {
 			throw new EntidadeEmUsoException(
 					String.format("Cidade de código %d não pode ser removida, pois está em uso.", cidadeId));
 		}
+	}
+
+	public Cidade buscarOuFalhar(Long id) {
+		return cidadeRepository.findById(id)
+				.orElseThrow(() -> new EntidadeNaoEncontradaException("Entidade não encontrada"));
+
 	}
 }

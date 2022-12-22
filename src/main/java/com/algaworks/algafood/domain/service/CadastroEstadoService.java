@@ -24,12 +24,15 @@ public class CadastroEstadoService {
 		try {
 			estadoRepository.deleteById(estadoId);
 		} catch (EmptyResultDataAccessException e) {
-			throw new EntidadeNaoEncontradaException
-			(String.format("Não existe Estado com id: %d", estadoId));
+			throw new EntidadeNaoEncontradaException(String.format("Não existe Estado com id: %d", estadoId));
 		} catch (DataIntegrityViolationException e) {
 			throw new EntidadeEmUsoException(
-					String.format
-					("Entidade com id %d não pode ser removido, pois está em uso", estadoId));
+					String.format("Entidade com id %d não pode ser removido, pois está em uso", estadoId));
 		}
+	}
+
+	public Estado buscarOuFalhar(Long estadoId) {
+		return estadoRepository.findById(estadoId)
+				.orElseThrow(() -> new EntidadeNaoEncontradaException("EntidadeNaoEncontrada."));
 	}
 }
