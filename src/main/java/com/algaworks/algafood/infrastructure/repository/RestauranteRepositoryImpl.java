@@ -6,6 +6,7 @@ import static com.algaworks.algafood.infrastructure.repository.spec.RestauranteS
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepositoryQueries;
@@ -60,4 +62,5 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 	public List<Restaurante> findComFreteGratis(String nome) {
 		return restauranteRepository.findAll(comNomeSemelhante(nome).and(comFreteGratis()));
 	}
+
 }

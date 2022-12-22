@@ -1,6 +1,7 @@
 package com.algaworks.algafood.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -28,6 +29,9 @@ public class Usuario {
 	private Long id;
 
 	@Column(nullable = false)
+	private String descricao;
+
+	@Column(nullable = false)
 	private String nome;
 
 	@Column(nullable = false)
@@ -41,8 +45,7 @@ public class Usuario {
 	private LocalDateTime dataCadastro;
 
 	@ManyToMany
-	@JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "usuario_id"),
-	inverseJoinColumns = @JoinColumn(name = "grupo_id"))
+	@JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "grupo_id"))
 	private List<Grupo> grupos;
 
 }

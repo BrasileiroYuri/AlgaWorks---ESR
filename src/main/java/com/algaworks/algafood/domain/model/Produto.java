@@ -32,12 +32,16 @@ public class Produto {
 	private String descricao;
 
 	@Column(nullable = false)
+	private String name;
+
+	@Column(nullable = false)
 	private BigDecimal preco;
 
 	@Column(nullable = false)
 	private Boolean ativo;
 
 	@JsonIgnore
+
 	@ManyToOne
 	@JoinColumn(nullable = false)
 	private Restaurante restaurante;
