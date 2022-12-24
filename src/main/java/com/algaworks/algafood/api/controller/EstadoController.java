@@ -1,10 +1,10 @@
 package com.algaworks.algafood.api.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,17 +19,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 import com.algaworks.algafood.domain.service.CadastroEstadoService;
 
-/*@RestController -> Essa notação é uma junção das duas abaixo. Melhora a semântica ao vermos que trata-se de um controlador na arquitetura Rest.*/
-@Controller /*-> Essa notação define que a classe que é responsável por receber requisições, tratá-las e retornar uma resposta.*/
-@ResponseBody /*-> Essa notação define que o retorno dos métodos deve ser a resposta da requisição.*/
-@RequestMapping("/estados") /*-> Essa notação define que as resquisições enviadas a URN citada serão tratadas por esse Controller.*/
-public class EstadoController {
+@Controller
+@ResponseBody
+@RequestMapping("/estados")
+public class EstadoController<T> {
 
-	@Autowired /*-> Apesar da notação @Component estar apenas na implementação, o Spring considera esse tipo genérico como componente, por seu tipo específico estar notado*/
+	@Autowired
 	private EstadoRepository estadoRepository;
 
 	@Autowired
@@ -41,12 +41,8 @@ public class EstadoController {
 	}
 
 	@GetMapping("/{estadoId}")
-	public ResponseEntity<Estado> buscar(@PathVariable Long estadoId) {
-		Optional <Estado> estado = estadoRepository.findById(estadoId);
-		if (estado.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-		return ResponseEntity.status(HttpStatus.OK).body(estado.get());
+	public Estado buscar(@PathVariable Long estadoId) {
+		return cadastroEstado.buscarOuFalhar(estadoId);
 	}
 
 	@PostMapping
@@ -55,14 +51,10 @@ public class EstadoController {
 	}
 
 	@PutMapping("/{estadoId}")
-	public ResponseEntity<?> atualizar(@PathVariable Long estadoId, @RequestBody Estado estado) {
-		Optional <Estado> estadoAtual = estadoRepository.findById(estadoId);
-		if (estadoAtual.isPresent()) {
-			BeanUtils.copyProperties(estado, estadoAtual, "id");
-			Estado estadoSalvar = cadastroEstado.salvar(estadoAtual.get());
-			return ResponseEntity.ok(estadoSalvar);
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	public Estado atualizar(@PathVariable Long estadoId, @RequestBody Estado estado) {
+		Estado estadoAtual = cadastroEstado.buscarOuFalhar(estadoId);
+		BeanUtils.copyProperties(estado, estadoAtual, "id");
+		return cadastroEstado.salvar(estadoAtual);
 	}
 
 	@DeleteMapping("/{estadoId}")
@@ -70,7 +62,7 @@ public class EstadoController {
 		try {
 			cadastroEstado.remover(estadoId);
 			return ResponseEntity.noContent().build();
-		} catch (EntidadeNaoEncontradaException e) {
+		} catch (EstadoNaoEncontradoException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		} catch (EntidadeEmUsoException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();

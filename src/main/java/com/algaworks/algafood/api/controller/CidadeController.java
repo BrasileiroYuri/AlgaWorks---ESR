@@ -1,7 +1,7 @@
 package com.algaworks.algafood.api.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.controller.exceptionhandler.Problema;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood.domain.exception.EstadoNaoEncontradoException;
+import com.algaworks.algafood.domain.exception.NegocioException;
 import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.repository.CidadeRepository;
 import com.algaworks.algafood.domain.service.CadastroCidadeService;
@@ -32,7 +36,7 @@ public class CidadeController {
 
 	@Autowired
 	private CadastroCidadeService cadastroCidade;
-	
+
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<Cidade> listar() {
@@ -40,36 +44,27 @@ public class CidadeController {
 	}
 
 	@GetMapping("/{cidadeId}")
-	public ResponseEntity<?> buscar(@PathVariable Long cidadeId) {
-		Optional<Cidade> cidade = cidadeRepository.findById(cidadeId);
-		if (cidade.isPresent()) {
-			return ResponseEntity.status(HttpStatus.OK).body(cidade);
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	public Cidade buscar(@PathVariable Long cidadeId) {
+		return cadastroCidade.buscarOuFalhar(cidadeId);
 	}
 
 	@PostMapping
-	public ResponseEntity<?> adicionar(@RequestBody Cidade cidade) {
+	public Cidade adicionar(@RequestBody Cidade cidade) {
 		try {
-			cidade = cadastroCidade.salvar(cidade);
-			return ResponseEntity.status(HttpStatus.CREATED).body(cidade);
-		} catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			return cadastroCidade.salvar(cidade);
+		} catch (EstadoNaoEncontradoException e) {
+			throw new NegocioException(e.getMessage(), e.getCause());
 		}
 	}
 
 	@PutMapping("/{cidadeId}")
-	public ResponseEntity<?> atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade) {
+	public Cidade atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade) {
 		try {
-			Optional<Cidade> cidadeAtual = cidadeRepository.findById(cidadeId); /* Aqui eu verifico se a cidade existe. */
-			if (cidadeAtual.isPresent()) { /* Se ela existir, entra aqui. */
-				BeanUtils.copyProperties(cidade, cidadeAtual.get(), "id"); /* Copio as propriedades */
-				Cidade cidadeSalva= cadastroCidade.salvar(cidadeAtual.get()); /* Tento salvar. */
-				return ResponseEntity.status(HttpStatus.OK).body(cidadeSalva);
-			}
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		} catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			Cidade cidadeAtual = cadastroCidade.buscarOuFalhar(cidadeId);
+			BeanUtils.copyProperties(cidade, cidadeAtual, "id");
+			return cadastroCidade.salvar(cidadeAtual);
+		} catch (EstadoNaoEncontradoException e) {
+			throw new NegocioException(e.getMessage(), e);
 		}
 	}
 
@@ -85,4 +80,17 @@ public class CidadeController {
 		}
 	}
 
+	@ExceptionHandler
+	public ResponseEntity<?> tratarEntidadeNaoEncontradaException(EntidadeNaoEncontradaException e) {
+		Problema problema = Problema.builder().dataHora(LocalDateTime.now()).mensagem(e.getMessage()).build();
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problema);
+	}
+
+	@ExceptionHandler(NegocioException.class)
+	public ResponseEntity<?> tratarNegocioException(NegocioException e) {
+		Problema problema = Problema.builder().dataHora(LocalDateTime.now()).mensagem(e.getMessage()).build();
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problema);
+	}
 }

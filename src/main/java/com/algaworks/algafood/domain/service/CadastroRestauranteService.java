@@ -6,7 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
-import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
@@ -15,9 +15,9 @@ import com.algaworks.algafood.domain.repository.RestauranteRepository;
 @Service
 public class CadastroRestauranteService {
 
-	private static final String ENTIDADE_DE_ID_D_ESTÁ_EM_USO = "Entidade de id: %d está em uso.";
+	private static final String ENTIDADE_DE_ID_D_ESTÁ_EM_USO = "Restaurante de id %d está em uso. ";
 
-	private static final String ENTITY_NOT_FOUND_ID = "Entity not found. Id: %d";
+	private static final String ENTITY_NOT_FOUND_ID = "Restaurante de id %d não encontrado.";
 
 	@Autowired
 	private RestauranteRepository restauranteRepository;
@@ -39,15 +39,13 @@ public class CadastroRestauranteService {
 		try {
 			restauranteRepository.deleteById(restauranteId);
 		} catch (EmptyResultDataAccessException e) {
-			throw new EntidadeNaoEncontradaException(String.format(ENTITY_NOT_FOUND_ID, restauranteId));
+			throw new RestauranteNaoEncontradoException(restauranteId);
 		} catch (DataIntegrityViolationException e) {
 			throw new EntidadeEmUsoException(String.format(ENTIDADE_DE_ID_D_ESTÁ_EM_USO, restauranteId));
 		}
 	}
 
 	public Restaurante buscarOuFalhar(Long id) {
-		return restauranteRepository.findById(id)
-				.orElseThrow(() -> new EntidadeNaoEncontradaException(String.format(ENTITY_NOT_FOUND_ID, id)));
+		return restauranteRepository.findById(id).orElseThrow(() -> new RestauranteNaoEncontradoException(id));
 	}
-
 }
