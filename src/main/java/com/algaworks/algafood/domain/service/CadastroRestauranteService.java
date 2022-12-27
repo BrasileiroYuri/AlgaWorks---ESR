@@ -9,7 +9,6 @@ import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
-import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 
 @Service
@@ -17,16 +16,11 @@ public class CadastroRestauranteService {
 
 	private static final String ENTIDADE_DE_ID_D_ESTÁ_EM_USO = "Restaurante de id %d está em uso. ";
 
-	private static final String ENTITY_NOT_FOUND_ID = "Restaurante de id %d não encontrado.";
-
 	@Autowired
 	private RestauranteRepository restauranteRepository;
 
 	@Autowired
 	private CadastroCozinhaService cadastroCozinha;
-
-	@Autowired
-	private CozinhaRepository cozinhaRepository;
 
 	public Restaurante salvar(Restaurante restaurante) {
 		Long cozinhaId = restaurante.getCozinha().getId();
