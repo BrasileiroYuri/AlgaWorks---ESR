@@ -44,6 +44,7 @@ public class Restaurante {
 	@Column(nullable = false)
 	private String nome;
 
+	@NotNull
 	@JsonProperty("taxaFrete")
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
@@ -55,7 +56,7 @@ public class Restaurante {
 	@JsonIgnore
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
-	private LocalDateTime dataCadastro;
+	private LocalDateTime dataCadastro = LocalDateTime.now();
 
 	@UpdateTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
