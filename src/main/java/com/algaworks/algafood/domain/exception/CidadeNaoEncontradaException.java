@@ -1,9 +1,5 @@
 package com.algaworks.algafood.domain.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(HttpStatus.NOT_FOUND)
 public class CidadeNaoEncontradaException extends EntidadeNaoEncontradaException {
 
 	private static final long serialVersionUID = 1L;
@@ -12,9 +8,8 @@ public class CidadeNaoEncontradaException extends EntidadeNaoEncontradaException
 		super(mensagem);
 	}
 
-	public CidadeNaoEncontradaException(Long cozinhaId) {
-		this(String.format("Cidade de id %d não encontrada.", cozinhaId));
+	public CidadeNaoEncontradaException(Long cidadeId) {
+		this(String.format("Cidade de id %d não encontrada.", cidadeId));
 	}
-
 
 }

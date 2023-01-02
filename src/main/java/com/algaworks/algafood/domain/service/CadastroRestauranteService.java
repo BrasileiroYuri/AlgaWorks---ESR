@@ -9,24 +9,18 @@ import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
-import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 
 @Service
 public class CadastroRestauranteService {
 
-	private static final String ENTIDADE_DE_ID_D_ESTÁ_EM_USO = "Restaurante de id %d está em uso. ";
-
-	private static final String ENTITY_NOT_FOUND_ID = "Restaurante de id %d não encontrado.";
+	private static final String ENTIDADE_DE_ID_D_ESTA_EM_USO = "Restaurante %s está em uso. ";
 
 	@Autowired
 	private RestauranteRepository restauranteRepository;
 
 	@Autowired
 	private CadastroCozinhaService cadastroCozinha;
-
-	@Autowired
-	private CozinhaRepository cozinhaRepository;
 
 	public Restaurante salvar(Restaurante restaurante) {
 		Long cozinhaId = restaurante.getCozinha().getId();
@@ -41,7 +35,8 @@ public class CadastroRestauranteService {
 		} catch (EmptyResultDataAccessException e) {
 			throw new RestauranteNaoEncontradoException(restauranteId);
 		} catch (DataIntegrityViolationException e) {
-			throw new EntidadeEmUsoException(String.format(ENTIDADE_DE_ID_D_ESTÁ_EM_USO, restauranteId));
+			throw new EntidadeEmUsoException(
+					String.format(ENTIDADE_DE_ID_D_ESTA_EM_USO, buscarOuFalhar(restauranteId).getNome()), e);
 		}
 	}
 
