@@ -14,7 +14,7 @@ import com.algaworks.algafood.domain.repository.RestauranteRepository;
 @Service
 public class CadastroRestauranteService {
 
-	private static final String ENTIDADE_DE_ID_D_ESTÁ_EM_USO = "Restaurante de id %d está em uso. ";
+	private static final String ENTIDADE_DE_ID_D_ESTA_EM_USO = "Restaurante %s está em uso. ";
 
 	@Autowired
 	private RestauranteRepository restauranteRepository;
@@ -35,7 +35,8 @@ public class CadastroRestauranteService {
 		} catch (EmptyResultDataAccessException e) {
 			throw new RestauranteNaoEncontradoException(restauranteId);
 		} catch (DataIntegrityViolationException e) {
-			throw new EntidadeEmUsoException(String.format(ENTIDADE_DE_ID_D_ESTÁ_EM_USO, restauranteId));
+			throw new EntidadeEmUsoException(
+					String.format(ENTIDADE_DE_ID_D_ESTA_EM_USO, buscarOuFalhar(restauranteId).getNome()), e);
 		}
 	}
 

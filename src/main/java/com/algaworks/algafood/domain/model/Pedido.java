@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -42,13 +41,15 @@ public class Pedido {
 
 	@Embedded
 	private Endereco enderecoEntrega;
-	
+
 	@CreationTimestamp
 	@Column(nullable = false)
 	private LocalDateTime dataCriacao;
 
 	private LocalDateTime dataConfirmacao;
+
 	private LocalDateTime dataCancelamento;
+
 	private LocalDateTime dataEntrega;
 
 	@JoinColumn(nullable = false)
@@ -65,7 +66,7 @@ public class Pedido {
 
 	@Column(nullable = false)
 	private StatusPedido statusPedido;
-	
+
 	@OneToMany(mappedBy = "pedido")
 	private List<ItemPedido> itens = new ArrayList<>();
 
