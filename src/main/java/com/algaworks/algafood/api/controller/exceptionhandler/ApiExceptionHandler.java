@@ -149,16 +149,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-//		BindingResult bindingResult = ex.getBindingResult();
-		List<Problem.Field> problemFields = ex.getFieldErrors().stream().map(fieldError -> Problem.Field.builder()
-				.name(fieldError.getField()).userMessag(fieldError.getDefaultMessage()).build()).toList();
+		List<Problem.Field> problemFields = ex.getFieldErrors().stream()
+				.map(fieldError -> Problem.Field.builder().name(fieldError.getField())
+						.userMessag(fieldError.getField() + " " + fieldError.getDefaultMessage()).build())
+				.toList();
 
-//		String fiel = problemFields.stream().filter(field -> field.getName().length() < 5).map(t -> t.getName())
-//				.collect(Collectors.joining());
-//		System.out.println(fiel);
-
-		String detail = String.format("O recurso %s não pode ter a propriedade '%s' nula.", ex.getObjectName(),
-				ex.getFieldError().getField());
+		var campos = problemFields.stream().map(field -> field.getName()).collect(Collectors.joining(", "));
+		String detail = String.format("O recurso %s não pode ter a(a) propriedade(s) '%s' nula(s) ou inválida(s).",
+				ex.getObjectName(), campos);
 		Problem problem = createProblemBuilder(status, ProblemType.DADOS_INVALIDOS, detail).userMessage(detail)
 				.fields(problemFields).build();
 		return handleExceptionInternal(ex, problem, headers, status, request);

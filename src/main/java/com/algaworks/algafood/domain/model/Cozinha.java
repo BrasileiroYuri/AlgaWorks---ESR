@@ -20,7 +20,6 @@ import lombok.EqualsAndHashCode.Include;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Cozinha {
-
 	@Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

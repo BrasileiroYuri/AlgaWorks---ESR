@@ -16,7 +16,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -44,6 +46,9 @@ public class Restaurante {
 	@Column(nullable = false)
 	private String nome;
 
+	@NotNull
+	@PositiveOrZero
+	@DecimalMax("20")
 	@JsonProperty("taxaFrete")
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
