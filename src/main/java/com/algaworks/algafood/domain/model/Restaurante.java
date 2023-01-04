@@ -20,6 +20,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -44,19 +46,20 @@ public class Restaurante {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull(groups = {Groups.CadastroRestaurante.class})
+	@NotNull
 	@Column(nullable = false)
 	private String nome;
 
 	@NotNull
-	@PositiveOrZero(groups = Groups.CadastroRestaurante.class)
+	@PositiveOrZero
 	@DecimalMax("20")
 	@JsonProperty("taxaFrete")
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
 
+	@ConvertGroup(from = Default.class, to = Groups.CozinhaId.class)
 	@Valid
-	@NotNull(groups = Groups.CadastroRestaurante.class)
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "cozinha_id", nullable = false)
 	private Cozinha cozinha;
