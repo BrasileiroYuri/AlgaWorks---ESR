@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.algaworks.algafood.Groups;
+import com.algaworks.algafood.Groups.EstadoId;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +19,7 @@ import lombok.EqualsAndHashCode.Include;
 @Entity
 public class Estado {
 
-	@NotNull(groups = Groups.EstadoId.class)
+	@NotNull(groups = EstadoId.class)
 	@Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +28,5 @@ public class Estado {
 	@NotBlank
 	@Column(nullable = false)
 	private String nome;
+	
 }

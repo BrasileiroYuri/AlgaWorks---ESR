@@ -11,6 +11,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.PropertyValueException;
 import org.hibernate.exception.DataException;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +40,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private static final String MSG_ERRO_GENERICO_USUARIO_FINAL = "Ocorreu um erro interno inesperado no sistema."
 			+ " Tente novamente e se o problema persistir, entre em contato com o administrador do sistema.";
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@ExceptionHandler(EntidadeNaoEncontradaException.class)
 	public ResponseEntity<?> handleEntidadeNaoEncontrada(EntidadeNaoEncontradaException ex, WebRequest request) {
@@ -148,12 +154,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-		List<Problem.Field> problemFields = ex.getFieldErrors().stream()
-				.map(fieldError -> Problem.Field.builder().name(fieldError.getField())
-						.userMessag(fieldError.getField() + " " + fieldError.getDefaultMessage()).build())
-				.toList();
-
+		List<Problem.Field> problemFields = ex.getFieldErrors().stream().map(fieldError -> {
+			String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+			return Problem.Field.builder().name(fieldError.getField()).userMessag(message).build();
+		}).toList();
 		var campos = problemFields.stream().map(field -> field.getName()).collect(Collectors.joining(", "));
 		String detail = String.format("O recurso %s não pode ter a(a) propriedade(s) '%s' nula(s) ou inválida(s).",
 				ex.getObjectName(), campos);
@@ -181,7 +185,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = "Ocorreu um erro de violação de integridade de dados";
 		Problem problem = createProblemBuilder(status, ProblemType.INTEGRIDADE_DE_DADOS, detail).userMessage(detail)
 				.build();
-
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 
