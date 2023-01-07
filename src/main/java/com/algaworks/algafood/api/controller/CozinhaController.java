@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,12 +32,12 @@ public class CozinhaController {
 	@Autowired
 	private CadastroCozinhaService cadastroCozinha;
 
-	@GetMapping
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public List<Cozinha> listar() {
 		return cozinhaRepository.findAll();
 	}
 
-	@GetMapping("/{cozinhaId}")
+	@RequestMapping(value = "/{cozinhaId}", method = RequestMethod.GET)
 	public Cozinha buscar(@PathVariable Long cozinhaId) {
 		return cadastroCozinha.buscarOuFalhar(cozinhaId);
 	}

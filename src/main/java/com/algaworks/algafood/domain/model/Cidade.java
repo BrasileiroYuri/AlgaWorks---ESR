@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
-import com.algaworks.algafood.Groups.EstadoId;
+import com.algaworks.algafood.core.validation.Groups.EstadoId;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
