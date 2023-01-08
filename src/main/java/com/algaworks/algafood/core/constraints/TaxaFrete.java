@@ -1,4 +1,4 @@
-package com.algaworks.algafood.core.validation;
+package com.algaworks.algafood.core.constraints;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -27,7 +27,12 @@ import javax.validation.constraints.PositiveOrZero;
 public @interface TaxaFrete {
 
 	@OverridesAttribute(constraint = PositiveOrZero.class, name = "message")
-	String message() default "{javax.validation.constraints.PositiveOrZero.message}";
+	String messagePositiveOrZero() default "Taxa frete inválida.";
+
+	@OverridesAttribute(constraint = DecimalMax.class, name = "message")
+	String messageDecimalMax() default "{2}";
+
+	String message() default "";
 
 	Class<?>[] groups() default {};
 
